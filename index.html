@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Simuladores — Elétrico, Equipotencial e Fluxograma</title>
+<style>
+  :root{ --b:#1c2948; --card:#0f1730; --accent:#22d3ee; --ink:#e7eef7; }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+       background:radial-gradient(900px 600px at 10% -10%,#0d1630 0%,transparent 60%),linear-gradient(180deg,#0a1124,#0b1020)}
+  header{padding:18px 22px;border-bottom:1px solid var(--b)}
+  main{max-width:900px;margin:0 auto;padding:24px;display:grid;gap:16px}
+  .grid{display:grid;grid-template-columns:1fr;gap:14px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02));
+        border:1px solid var(--b);border-radius:16px;padding:18px}
+  a.btn{display:inline-block;margin-top:8px;background:var(--accent);color:#05212a;
+        text-decoration:none;padding:10px 14px;border-radius:12px;font-weight:800}
+  p{margin:6px 0 0}
+</style>
+</head>
+<body>
+<header><h1>Simuladores interativos</h1></header>
+<main class="grid">
+  <div class="card">
+    <h2>Campo Elétrico</h2>
+    <p>Visualize setas/linhas de campo para duas cargas, com narração do Tesla.</p>
+    <a class="btn" href="explicacao_campo_eletrico.html">Abrir “Campo Elétrico” →</a>
+  </div>
+
+  <div class="card">
+    <h2>Campo Equipotencial</h2>
+    <p>Linhas de mesmo potencial (V) e mapa de calor, com arraste de cargas e narração.</p>
+    <a class="btn" href="campo_equipotencial.html">Abrir “Campo Equipotencial” →</a>
+  </div>
+
+  <div class="card">
+    <h2>Fluxograma do Simulador</h2>
+    <p>Fluxo didático (início → meio → fim) do código, surgindo etapa a etapa com o Tesla.</p>
+    <a class="btn" href="fluxograma.html">Abrir “Fluxograma” →</a>
+  </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Campo Equipotencial — Nikola Tesla Explica</title>
+<style>
+  :root{
+    --bg:#0b1020; --ink:#e7eef7; --muted:#a9b7d0; --b:#1c2948; --card:#0f1730;
+    --accent:#22d3ee; --warn:#ffd166; --plus:#ff8585; --minus:#7aa7ff;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+       background:radial-gradient(900px 600px at 10% -10%,#0d1630 0%,transparent 60%),linear-gradient(180deg,#0a1124,#0b1020)}
+  header{padding:14px 22px;border-bottom:1px solid var(--b);display:flex;gap:12px;align-items:center}
+  .brand{font-weight:800}
+  .spacer{flex:1}
+  a.back{padding:10px 14px;border-radius:10px;text-decoration:none;color:#05212a;background:var(--accent);font-weight:800}
+
+  main{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr;gap:18px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid var(--b);border-radius:18px;padding:16px;box-shadow:0 24px 48px rgba(0,0,0,.35)}
+  .title{font-weight:800;margin:0 0 8px}
+
+  .stage-wrap{border:1px solid var(--b);border-radius:16px;padding:12px;background:#0c1430a6}
+  .stage{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px;align-items:start}
+  @media (max-width:980px){.stage{grid-template-columns:1fr}}
+
+  canvas#sim{width:100%; height:420px; border-radius:12px; border:1px solid var(--b); background:#081029}
+
+  .explain{background:#0f1a3c;border:1px solid #1c2948;border-radius:12px;padding:12px}
+  .explain h3{margin:0 0 8px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;margin:6px 0 10px}
+  .kv span{color:#9fb0d8}
+  .bullets{margin:10px 0 0 18px; padding:0} .bullets li{margin:6px 0; color:#cdd7ee}
+  .note{color:#a9b7d0;font-size:13px}
+
+  .tesla{display:flex;gap:12px;align-items:flex-end;margin:10px 0 8px}
+  .tesla svg{width:160px;max-width:40%;height:auto;flex:0 0 auto;border-radius:12px;background:radial-gradient(120px 120px at 60% 5%, rgba(96,165,250,.1), transparent 60%)}
+  .tesla .bubble{flex:1;background:#0b1535;border:1px solid #1a2a58;padding:10px;border-radius:12px}
+  .tesla .bubble p{margin:0}
+
+  .tesla.talk #mouth { transform-origin:50% 50%; animation:mouth 0.22s ease-in-out infinite alternate; }
+  .tesla.talk #sparks { opacity:1; animation:spark 0.6s linear infinite; }
+  #sparks{ opacity:.0; }
+
+  @keyframes mouth { from { transform:scaleY(0.6); } to { transform:scaleY(1.15); } }
+  @keyframes spark {
+    0%{filter:drop-shadow(0 0 0 rgba(255,215,0,.0));}
+    50%{filter:drop-shadow(0 0 12px rgba(255,215,0,.6));}
+    100%{filter:drop-shadow(0 0 0 rgba(255,215,0,.0));}
+  }
+
+  .ctrl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+  @media (max-width:700px){.ctrl-grid{grid-template-columns:1fr}}
+  .ctrl{background:#0f1a3c;border:1px solid #1c2948;border-radius:12px;padding:12px}
+  .ctrl label{display:block;color:#a9b7d0;font-size:13px;margin:4px 0}
+  .ctrl input[type="range"]{width:100%}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  button{background:var(--accent);color:#05212a;border:none;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(34,211,238,.25)}
+  button.secondary{background:#1f2937;color:#e5e7eb}
+  button.warn{background:var(--warn);color:#2b1900}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Campo Equipotencial</div>
+  <div class="spacer"></div>
+  <a class="back" href="index.html">← Escolher página</a>
+</header>
+
+<main>
+  <section class="card">
+    <h2 class="title">O que é uma superfície (linha) equipotencial?</h2>
+    <p><b>Equipotenciais</b> são lugares onde o <b>potencial elétrico V</b> é o mesmo. Em tais linhas (no plano),
+       mover uma carga de teste não exige trabalho líquido: <em>W = q·ΔV = 0</em>. As linhas equipotenciais são
+       sempre <b>perpendiculares</b> às linhas de campo.</p>
+
+    <div class="stage-wrap">
+      <h3 style="margin:0 0 8px">Explore as equipotenciais de duas cargas</h3>
+
+      <div class="stage">
+        <canvas id="sim" width="720" height="420" aria-label="Simulador de equipotenciais com duas cargas"></canvas>
+
+        <div class="explain">
+          <h3>O que está acontecendo agora?</h3>
+
+          <!-- AVATAR NIKOLA TESLA -->
+          <div class="tesla" id="teslaBox" aria-live="polite">
+            <svg viewBox="0 0 200 260" role="img" aria-label="Avatar de Nikola Tesla">
+              <circle cx="100" cy="70" r="64" fill="#0b233f"/>
+              <circle cx="100" cy="88" r="50" fill="#ffd9a6" />
+              <path d="M52,88 C52,55 78,38 100,38 C122,38 148,55 148,88
+                       C132,78 120,74 100,74 C80,74 68,78 52,88 Z"
+                    fill="#0e1322"/>
+              <circle cx="52" cy="96" r="8" fill="#ffd9a6"/>
+              <circle cx="148" cy="96" r="8" fill="#ffd9a6"/>
+              <ellipse cx="82" cy="102" rx="6" ry="4" fill="#15233a"/>
+              <ellipse cx="118" cy="102" rx="6" ry="4" fill="#15233a"/>
+              <path d="M100 100 L98 116 Q100 118 102 116 Z" fill="#efc08a"/>
+              <path d="M78 118 C88 126, 112 126, 122 118
+                       C111 122, 89 122, 78 118 Z" fill="#1b2235"/>
+              <rect id="mouth" x="92" y="130" width="16" height="6" rx="3" fill="#c96f6f"/>
+              <path d="M50,210 L150,210 L140,140 L60,140 Z" fill="#0e1322"/>
+              <rect x="92" y="138" width="16" height="36" fill="#e6eefc"/>
+              <path d="M100,174 L110,210 L90,210 Z" fill="#27406b"/>
+              <g id="sparks" stroke="#ffd166" stroke-width="2" fill="none">
+                <polyline points="30,40 40,45 32,55 44,62 36,72"/>
+                <polyline points="170,44 160,50 168,60 156,66 164,76"/>
+                <polyline points="24,110 34,108 28,120 40,122 34,134"/>
+                <polyline points="176,112 166,110 172,122 160,124 166,136"/>
+              </g>
+            </svg>
+
+            <div class="bubble">
+              <p id="nText">Ative a narração e eu explico como as equipotenciais mudam em tempo real.</p>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top:2px">
+            <button id="toggleAuto" class="warn">▶️ Narrar automático</button>
+            <button id="sayNow">🔊 Falar agora</button>
+            <button id="pause" class="secondary">⏸ Pausar</button>
+          </div>
+
+          <div class="kv">
+            <span>Tipo do sistema:</span> <div id="tipo">—</div>
+            <span>Interação (campo):</span> <div id="interacao">—</div>
+            <span>Separação d:</span> <div id="sep">—</div>
+            <span>Orientação:</span> <div id="orient">—</div>
+            <span>V no meio:</span> <div id="midV">—</div>
+            <span>Gradiente |∇V|:</span> <div id="grad">—</div>
+          </div>
+          <ul id="story" class="bullets"></ul>
+          <p class="note">Dica: arraste as <b>esferas</b> no quadro ou use os controles abaixo. As linhas equipotenciais são sempre perpendiculares às linhas de campo.</p>
+        </div>
+      </div>
+
+      <!-- Controles abaixo -->
+      <div class="ctrl-grid">
+        <div class="ctrl">
+          <h4 style="margin:0 0 6px">Q₁ (esquerda)</h4>
+          <label>Módulo e sinal</label>
+          <input id="q1" type="range" min="-2" max="2" step="0.1" value="1">
+          <label>Posição X₁</label>
+          <input id="x1" type="range" min="-1.9" max="0" step="0.02" value="-1">
+          <label>Posição Y₁</label>
+          <input id="y1" type="range" min="-1.6" max="1.6" step="0.02" value="0">
+        </div>
+        <div class="ctrl">
+          <h4 style="margin:0 0 6px">Q₂ (direita)</h4>
+          <label>Módulo e sinal</label>
+          <input id="q2" type="range" min="-2" max="2" step="0.1" value="-1">
+          <label>Posição X₂</label>
+          <input id="x2" type="range" min="0" max="1.9" step="0.02" value="1">
+          <label>Posição Y₂</label>
+          <input id="y2" type="range" min="-1.6" max="1.6" step="0.02" value="0">
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:10px">
+        <button id="bContours">Linhas equipotenciais</button>
+        <button id="bHeat">Mapa de potencial</button>
+        <button id="bBoth" class="secondary">Ambos</button>
+        <button id="bReset" class="secondary">Reiniciar</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =================== Canvas HiDPI + equipotenciais =================== */
+const cv = document.getElementById('sim');
+const ctx = cv.getContext('2d', { alpha:true });
+const state = { mode:'both', dragging:null, easing:0.18 };
+
+function fitCanvasToCSS() {
+  const rect = cv.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.max(1, Math.floor(rect.width  * dpr));
+  const h = Math.max(1, Math.floor(rect.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+}
+new ResizeObserver(fitCanvasToCSS).observe(cv);
+fitCanvasToCSS();
+
+/* sliders */
+const q1=document.getElementById('q1'), x1=document.getElementById('x1'), y1=document.getElementById('y1');
+const q2=document.getElementById('q2'), x2=document.getElementById('x2'), y2=document.getElementById('y2');
+
+/* conversões mundo [-2,2] ↔ tela (CSS) ↔ buffer (ctx) */
+function toPx(x, y) {
+  const rect = cv.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  const px = (x + 2) / 4 * w;
+  const py = h - (y + 2) / 4 * h;
+  const sx = px * (cv.width / w);
+  const sy = py * (cv.height / h);
+  return [sx, sy];
+}
+function toWorld(pxClient, pyClient) {
+  const rect = cv.getBoundingClientRect();
+  const w = rect.width, h = rect.height;
+  const x = 4 * (pxClient / w) - 2;
+  const y = 2 - 4 * (pyClient / h);
+  return [x, y];
+}
+
+/* modelo físico: V = Σ qi / sqrt(r^2 + eps) ; |E| ≈ |∇V| */
+const charges = [
+  { x:+x1.value, y:+y1.value, q:+q1.value, tx:+x1.value, ty:+y1.value },
+  { x:+x2.value, y:+y2.value, q:+q2.value, tx:+x2.value, ty:+y2.value }
+];
+const eps = 0.03; // suavização para evitar singularidade no V
+function V(x,y){
+  let v=0;
+  for(const c of charges){ const dx=x-c.x, dy=y-c.y; v += c.q / Math.sqrt(dx*dx+dy*dy+eps); }
+  return v;
+}
+function gradV(x,y){ // ∇V (derivadas analíticas)
+  let gx=0, gy=0;
+  for(const c of charges){
+    const dx=x-c.x, dy=y-c.y;
+    const r2 = dx*dx+dy*dy+eps;
+    const r = Math.sqrt(r2);
+    const coeff = -c.q / (r2 * r); // derivada de 1/r = -1/r^2 * dr/dx (com vetor)
+    gx += coeff * dx;
+    gy += coeff * dy;
+  }
+  return [gx,gy]; // lembrar: E = -∇V
+}
+
+/* desenho */
+function clear(){ ctx.clearRect(0,0,cv.width,cv.height); }
+function grid(alpha=0.18, step=0.5){
+  ctx.save(); ctx.globalAlpha=alpha; ctx.strokeStyle='#2a3d77'; ctx.lineWidth=1;
+  for(let x=-2;x<=2;x+=step){ const a=toPx(x,-2), b=toPx(x,2); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+  for(let y=-2;y<=2;y+=step){ const a=toPx(-2,y), b=toPx(2,y); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+  ctx.restore();
+}
+function drawCharge(x,y,q, glow=false){
+  const [px,py]=toPx(x,y); ctx.save(); ctx.lineWidth=2;
+  if(q>0){ ctx.fillStyle='#ff8585'; ctx.strokeStyle='#a52a2a'; }
+  else   { ctx.fillStyle='#7aa7ff'; ctx.strokeStyle='#204080'; }
+  if(glow){ ctx.shadowColor= q>0?'#fecaca':'#c8d8ff'; ctx.shadowBlur=18; }
+  ctx.beginPath(); ctx.arc(px,py,12,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#fff'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(q>0?'+':'−',px,py+1); ctx.restore();
+}
+
+/* Mapa de calor do potencial (render direto no buffer de pixels) */
+function drawHeat(){
+  const rect = cv.getBoundingClientRect();
+  const wPix = cv.width, hPix = cv.height;
+  const img = ctx.createImageData(wPix, hPix);
+  // amostragem: converter cada pixel para coordenadas de mundo
+  // para performance, podemos amostrar a cada 2 px:
+  const step = 2;
+  let vMin=Infinity, vMax=-Infinity;
+
+  // 1) varrer amostras para descobrir faixa [vMin, vMax]
+  for(let y=0;y<hPix;y+=step){
+    for(let x=0;x<wPix;x+=step){
+      const xw = 4*(x/wPix) - 2;
+      const yw = 2 - 4*(y/hPix);
+      const val = V(xw,yw);
+      if(val<vMin) vMin=val;
+      if(val>vMax) vMax=val;
+    }
+  }
+  // clamp simétrico para melhor contraste
+  const vmax = Math.max(Math.abs(vMin), Math.abs(vMax));
+  vMin=-vmax; vMax=vmax;
+
+  function colorMap(val){
+    // normaliza [-vmax, +vmax] → [0,1]
+    const t = Math.max(0, Math.min(1, (val - vMin) / (vMax - vMin)));
+    // paleta simples: azul → ciano → amarelo → vermelho
+    const r = Math.floor(255 * Math.max(0, 1.6*t - 0.3));
+    const g = Math.floor(255 * Math.max(0, 1.6*(1-Math.abs(t-0.5)*2)));
+    const b = Math.floor(255 * Math.max(0, 1.6*(1-t) - 0.3));
+    return [r,g,b,85]; // alpha baixo para sobrepor com contornos/grade
+  }
+
+  // 2) escrever pixels (em blocos step×step)
+  for(let y=0;y<hPix;y+=step){
+    for(let x=0;x<wPix;x+=step){
+      const xw = 4*(x/wPix) - 2;
+      const yw = 2 - 4*(y/hPix);
+      const val = V(xw,yw);
+      const [r,g,b,a] = colorMap(val);
+      for(let yy=0; yy<step && y+yy<hPix; yy++){
+        for(let xx=0; xx<step && x+xx<wPix; xx++){
+          const idx = ((y+yy)*wPix + (x+xx)) * 4;
+          img.data[idx] = r; img.data[idx+1] = g; img.data[idx+2] = b; img.data[idx+3] = a;
+        }
+      }
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+}
+
+/* Contornos por Marching Squares */
+function drawContours(){
+  ctx.save();
+  ctx.strokeStyle='#ffe08a'; ctx.lineWidth=1.5; ctx.globalAlpha=0.95;
+
+  const N = 60;  // resolução da malha
+  const M = 60;
+  const xs = Array.from({length:N+1}, (_,i)=> -2 + 4*i/N);
+  const ys = Array.from({length:M+1}, (_,j)=> -2 + 4*j/M);
+
+  // amostrar potencial
+  const Vg = Array.from({length:M+1}, ()=>Array(N+1).fill(0));
+  let vmax=0;
+  for(let j=0;j<=M;j++){
+    for(let i=0;i<=N;i++){
+      const val=V(xs[i], ys[j]); Vg[j][i]=val; vmax=Math.max(vmax, Math.abs(val));
+    }
+  }
+  // níveis simétricos em torno de 0
+  const levels = [];
+  const nLev = 12;
+  for(let k=1;k<=nLev;k++){
+    const t = k/(nLev+1);
+    levels.push( t*vmax*0.9, -t*vmax*0.9 );
+  }
+
+  function interp(x1,y1,v1, x2,y2,v2, v0){
+    const t = (v0 - v1) / (v2 - v1 + 1e-12);
+    return [ x1 + t*(x2-x1), y1 + t*(y2-y1) ];
+  }
+
+  // marching squares
+  for(const v0 of levels){
+    for(let j=0;j<M;j++){
+      for(let i=0;i<N;i++){
+        const xL=xs[i], xR=xs[i+1], yB=ys[j], yT=ys[j+1];
+        const vBL=Vg[j][i],   vBR=Vg[j][i+1];
+        const vTL=Vg[j+1][i], vTR=Vg[j+1][i+1];
+
+        const c0 = vBL>v0, c1 = vBR>v0, c2 = vTR>v0, c3 = vTL>v0; // sentido horário (BL,BR,TR,TL)
+        const idx = (c0?1:0) | (c1?2:0) | (c2?4:0) | (c3?8:0);
+
+        if(idx===0 || idx===15) continue;
+
+        // arestas: 0: BL-BR (baixo); 1: BR-TR (direita); 2: TR-TL (topo); 3: TL-BL (esquerda)
+        const edgePoints = [];
+        if([1,5,13,9,8,12,4].includes(idx)){ // baixo
+          edgePoints.push( interp(xL,yB,vBL, xR,yB,vBR, v0) );
+        }
+        if([3,7,11,10,2,6,4].includes(idx)){ // direita
+          edgePoints.push( interp(xR,yB,vBR, xR,yT,vTR, v0) );
+        }
+        if([14,6,7,5,8,10,2].includes(idx)){ // topo
+          edgePoints.push( interp(xR,yT,vTR, xL,yT,vTL, v0) );
+        }
+        if([12,13,11,9,1,3,8,12].includes(idx)){ // esquerda
+          edgePoints.push( interp(xL,yT,vTL, xL,yB,vBL, v0) );
+        }
+
+        // desenha pares
+        for(let e=0;e+1<edgePoints.length;e+=2){
+          const [xA,yA]=edgePoints[e], [xB,yB2]=edgePoints[e+1];
+          const [pxA,pyA]=toPx(xA,yA), [pxB,pyB]=toPx(xB,yB2);
+          ctx.beginPath(); ctx.moveTo(pxA,pyA); ctx.lineTo(pxB,pyB); ctx.stroke();
+        }
+      }
+    }
+  }
+  ctx.restore();
+}
+
+/* análise + narrativa (Tesla) */
+const tipoEl=document.getElementById('tipo'), intEl=document.getElementById('interacao'),
+      sepEl=document.getElementById('sep'),  oriEl=document.getElementById('orient'),
+      midVEl=document.getElementById('midV'), gradEl=document.getElementById('grad'),
+      story=document.getElementById('story'),
+      teslaBox=document.getElementById('teslaBox'), nText=document.getElementById('nText');
+
+function fmt(n){ return Number(n).toFixed(2); }
+function classify(){
+  const sA=Math.sign(charges[0].q), sB=Math.sign(charges[1].q);
+  const magRatio = Math.min(Math.abs(charges[0].q),Math.abs(charges[1].q)) / Math.max(Math.abs(charges[0].q),Math.abs(charges[1].q) || 1);
+  let tipo='—';
+  if (sA*sB<0 && magRatio>0.6) tipo='Dipolo (opostos, módulos parecidos)';
+  else if (sA*sB>0 && magRatio>0.6) tipo='Par igual (mesmo sinal, módulos parecidos)';
+  else tipo='Monopolo dominante (uma carga predomina)';
+  const inter = (sA*sB<0) ? 'Atração (linhas de campo de + para −)' : 'Repulsão (linhas saem de ambas)';
+  return {tipo, inter};
+}
+function orientation(dx,dy){
+  const ang = Math.atan2(dy,dx); const deg = ((ang*180/Math.PI)+360)%360;
+  const ref = Math.abs(dy)>Math.abs(dx) ? 'preferência no eixo Y' :
+              Math.abs(dx)>Math.abs(dy) ? 'preferência no eixo X' : 'diagonal';
+  return `${ref} (θ ≈ ${fmt(deg)}°)`;
+}
+function midStats(){
+  const mx=(charges[0].x+charges[1].x)/2, my=(charges[0].y+charges[1].y)/2;
+  const v = V(mx,my);
+  const [gx,gy] = gradV(mx,my);
+  const g = Math.hypot(gx,gy);
+  return {v, g};
+}
+function narrative(){
+  const dx=charges[1].x-charges[0].x, dy=charges[1].y-charges[0].y, d=Math.hypot(dx,dy);
+  const cls=classify();
+  const lines = [
+    `${cls.tipo}. Separação d≈${fmt(d)} e ${cls.inter}.`,
+    `Equipotenciais são perpendiculares às linhas de campo; mais próximas onde |∇V| é maior.`,
+    `Ao aproximar cargas, o gradiente cresce entre elas (linhas de V mais densas).`
+  ];
+  return lines;
+}
+
+/* Narrador (texto + voz) */
+const toggleAuto = document.getElementById('toggleAuto');
+const sayNow = document.getElementById('sayNow');
+const pauseBtn = document.getElementById('pause');
+let auto=false, lastNarration='', lastSpokeAt=0;
+
+function buildNarration(){
+  const dx=charges[1].x-charges[0].x, dy=charges[1].y-charges[0].y, d=Math.hypot(dx,dy);
+  const cls=classify();
+  const {v,g}=midStats();
+  const dir = orientation(dx,dy).replace(/\(.*\)/,'').trim();
+  let mode = state.mode==='both' ? 'linhas e mapa' : (state.mode==='contours' ? 'linhas' : 'mapa');
+  return `Sistema: ${cls.tipo}. Distância ≈ ${fmt(d)}. ${cls.inter}. `+
+         `Orientação com ${dir}. No ponto médio, V≈${fmt(v)} e |∇V|≈${fmt(g)}. `+
+         `Visualização: ${mode}. Equipotenciais ⟂ campo elétrico.`;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='pt-BR';
+  const vs=speechSynthesis.getVoices().filter(v=>/pt|braz/i.test(v.lang+v.name));
+  if(vs[0]) u.voice=vs[0];
+  u.onstart=()=> teslaBox.classList.add('talk');
+  u.onend  =()=> teslaBox.classList.remove('talk');
+  speechSynthesis.speak(u);
+}
+function updateNarrator(force=false){
+  const now=performance.now(), msg=buildNarration();
+  nText.textContent=msg;
+  const enough=(now-lastSpokeAt)>3000, changed=(msg!==lastNarration);
+  if((auto && changed && enough) || force){ speak(msg); lastSpokeAt=performance.now(); lastNarration=msg; }
+}
+toggleAuto.onclick = ()=>{ auto=!auto; toggleAuto.textContent=auto?'⏹ Parar narração automática':'▶️ Narrar automático';
+  toggleAuto.classList.toggle('warn',!auto); if(auto) updateNarrator(true); else speechSynthesis.cancel(); };
+sayNow.onclick = ()=> updateNarrator(true);
+pauseBtn.onclick = ()=> speechSynthesis.cancel();
+
+/* sliders → atualizam alvo e texto */
+[q1,x1,y1,q2,x2,y2].forEach(el=>el.addEventListener('input', ()=>{
+  charges[0].q=+q1.value; charges[1].q=+q2.value;
+  charges[0].tx=+x1.value; charges[0].ty=+y1.value;
+  charges[1].tx=+x2.value; charges[1].ty=+y2.value;
+  updateNarrator();
+}));
+
+/* Arraste (mouse + touch) com canvas responsivo */
+function hitTest(pxClient, pyClient){
+  const rect = cv.getBoundingClientRect();
+  const sx = pxClient * (cv.width / rect.width);
+  const sy = pyClient * (cv.height / rect.height);
+  for(let i=0;i<2;i++){
+    const [cx,cy]=toPx(charges[i].x,charges[i].y);
+    if(Math.hypot(sx-cx,sy-cy)<=18) return i;
+  } return -1;
+}
+function onPointerDown(e){
+  const rect=cv.getBoundingClientRect();
+  const px=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const py=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  const id=hitTest(px,py);
+  if(id>=0){ state.dragging=id; e.preventDefault(); }
+}
+function onPointerMove(e){
+  if(state.dragging===null) return;
+  const rect=cv.getBoundingClientRect();
+  const px=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const py=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  const [wx,wy]=toWorld(px,py);
+  const c=charges[state.dragging];
+  if('tx' in c){ c.tx=wx; c.ty=wy; } else { c.x=wx; c.y=wy; }
+  if(state.dragging===0){ x1.value=wx; y1.value=wy; } else { x2.value=wx; y2.value=wy; }
+  updateNarrator();
+}
+function onPointerUp(){ state.dragging=null; }
+
+cv.addEventListener('mousedown',onPointerDown);
+cv.addEventListener('mousemove',onPointerMove);
+window.addEventListener('mouseup',onPointerUp);
+cv.addEventListener('touchstart',onPointerDown,{passive:false});
+cv.addEventListener('touchmove',onPointerMove,{passive:false});
+window.addEventListener('touchend',onPointerUp);
+
+/* botões de visualização */
+document.getElementById('bContours').onclick = ()=>{ state.mode='contours'; updateNarrator(); };
+document.getElementById('bHeat').onclick     = ()=>{ state.mode='heat';     updateNarrator(); };
+document.getElementById('bBoth').onclick     = ()=>{ state.mode='both';     updateNarrator(); };
+document.getElementById('bReset').onclick    = ()=>{
+  q1.value=1; q2.value=-1;
+  x1.value=-1; y1.value=0; x2.value=1; y2.value=0;
+  charges[0].q=+q1.value; charges[1].q=+q2.value;
+  charges[0].tx=+x1.value; charges[0].ty=+y1.value;
+  charges[1].tx=+x2.value; charges[1].ty=+y2.value;
+  updateNarrator(true);
+};
+
+/* render */
+function render(){
+  clear(); fitCanvasToCSS(); grid();
+
+  // easing de movimento das cargas
+  charges.forEach(c=>{ c.x += (c.tx - c.x)*state.easing; c.y += (c.ty - c.y)*state.easing; });
+
+  if(state.mode==='heat' || state.mode==='both'){ drawHeat(); }
+  if(state.mode==='contours' || state.mode==='both'){ drawContours(); }
+
+  drawCharge(charges[0].x,charges[0].y,charges[0].q, state.dragging===0);
+  drawCharge(charges[1].x,charges[1].y,charges[1].q, state.dragging===1);
+
+  // painel
+  const dx=charges[1].x-charges[0].x, dy=charges[1].y-charges[0].y, d=Math.hypot(dx,dy);
+  const cls=classify();
+  const {v,g}=midStats();
+  tipoEl.textContent=cls.tipo; intEl.textContent=cls.inter;
+  sepEl.textContent=`d ≈ ${fmt(d)} (dx=${fmt(dx)}, dy=${fmt(dy)})`;
+  oriEl.textContent=orientation(dx,dy);
+  midVEl.textContent=`V ≈ ${fmt(v)} (no ponto médio)`;
+  gradEl.textContent=`|∇V| ≈ ${fmt(g)} (intensidade de campo)`;
+
+  story.innerHTML='';
+  for(const t of narrative()){ const li=document.createElement('li'); li.textContent=t; story.appendChild(li); }
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

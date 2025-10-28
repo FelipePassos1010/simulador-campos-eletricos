@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Explicação — Campo Elétrico (Avatar Nikola Tesla)</title>
+<style>
+  :root{
+    --bg:#0b1020; --ink:#e7eef7; --muted:#a9b7d0; --b:#1c2948; --card:#0f1730;
+    --accent:#22d3ee; --warn:#ffd166; --plus:#ff8585; --minus:#7aa7ff;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+       background:radial-gradient(900px 600px at 10% -10%,#0d1630 0%,transparent 60%),linear-gradient(180deg,#0a1124,#0b1020)}
+  header{padding:14px 22px;border-bottom:1px solid var(--b);display:flex;gap:12px;align-items:center}
+  .brand{font-weight:800}
+  .spacer{flex:1}
+  a.back{padding:10px 14px;border-radius:10px;text-decoration:none;color:#05212a;background:var(--accent);font-weight:800}
+
+  main{max-width:1200px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr;gap:18px}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid var(--b);border-radius:18px;padding:16px;box-shadow:0 24px 48px rgba(0,0,0,.35)}
+  .title{font-weight:800;margin:0 0 8px}
+
+  /* contêiner retangular principal */
+  .stage-wrap{border:1px solid var(--b);border-radius:16px;padding:12px;background:#0c1430a6}
+  .stage{display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px;align-items:start}
+  @media (max-width:980px){.stage{grid-template-columns:1fr}}
+
+  canvas#sim{width:100%; height:420px; border-radius:12px; border:1px solid var(--b); background:#081029}
+
+  /* painel + avatar TESLA */
+  .explain{background:#0f1a3c;border:1px solid #1c2948;border-radius:12px;padding:12px}
+  .explain h3{margin:0 0 8px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;margin:6px 0 10px}
+  .kv span{color:#9fb0d8}
+  .bullets{margin:10px 0 0 18px; padding:0} .bullets li{margin:6px 0; color:#cdd7ee}
+  .note{color:#a9b7d0;font-size:13px}
+
+  /* AVATAR TESLA */
+  .tesla{display:flex;gap:12px;align-items:flex-end;margin:10px 0 8px}
+  .tesla svg{width:160px;max-width:40%;height:auto;flex:0 0 auto;border-radius:12px;background:radial-gradient(120px 120px at 60% 5%, rgba(96,165,250,.1), transparent 60%)}
+  .tesla .bubble{flex:1;background:#0b1535;border:1px solid #1a2a58;padding:10px;border-radius:12px}
+  .tesla .bubble p{margin:0}
+
+  /* boca e faíscas quando falando */
+  .tesla.talk #mouth { transform-origin:50% 50%; animation:mouth 0.22s ease-in-out infinite alternate; }
+  .tesla.talk #sparks { opacity:1; animation:spark 0.6s linear infinite; }
+  #sparks{ opacity:.0; }
+
+  @keyframes mouth {
+    from { transform:scaleY(0.6); } to { transform:scaleY(1.15); }
+  }
+  @keyframes spark {
+    0%{filter:drop-shadow(0 0 0 rgba(255,215,0,.0));}
+    50%{filter:drop-shadow(0 0 12px rgba(255,215,0,.6));}
+    100%{filter:drop-shadow(0 0 0 rgba(255,215,0,.0));}
+  }
+
+  /* controles de sliders abaixo do retângulo */
+  .ctrl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:12px}
+  @media (max-width:700px){.ctrl-grid{grid-template-columns:1fr}}
+  .ctrl{background:#0f1a3c;border:1px solid #1c2948;border-radius:12px;padding:12px}
+  .ctrl label{display:block;color:#a9b7d0;font-size:13px;margin:4px 0}
+  .ctrl input[type="range"]{width:100%}
+
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  button{background:var(--accent);color:#05212a;border:none;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(34,211,238,.25)}
+  button.secondary{background:#1f2937;color:#e5e7eb}
+  button.warn{background:var(--warn);color:#2b1900}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Explicação — Campo Elétrico</div>
+  <div class="spacer"></div>
+  <a class="back" href="index.html">← Voltar ao menu</a>
+</header>
+
+<main>
+  <section class="card">
+    <h2 class="title">O que é campo elétrico?</h2>
+    <p><strong>Campo elétrico</strong> diz o que aconteceria com uma <em>carga de teste positiva</em>: a seta indica a <b>direção</b> e o tamanho indica a <b>intensidade</b>. Ele sai do <span style="background:#ff8585;color:#3b0a0a;border-radius:999px;padding:0 8px"><b>+</b></span> e entra no <span style="background:#7aa7ff;color:#08133b;border-radius:999px;padding:0 8px"><b>−</b></span>. Com várias fontes, os campos se <u>somam vetor a vetor</u> (superposição).</p>
+
+    <div class="stage-wrap">
+      <h3 style="margin:0 0 8px">Brinque com duas cargas</h3>
+
+      <div class="stage">
+        <canvas id="sim" width="720" height="420" aria-label="Simulador de campo elétrico com duas cargas"></canvas>
+
+        <div class="explain">
+          <h3>O que está acontecendo agora?</h3>
+
+          <!-- AVATAR NIKOLA TESLA -->
+          <div class="tesla" id="teslaBox" aria-live="polite">
+            <!-- SVG estilizado: busto, cabelo, bigode e terno -->
+            <svg viewBox="0 0 200 260" role="img" aria-label="Avatar de Nikola Tesla">
+              <!-- halo -->
+              <circle cx="100" cy="70" r="64" fill="#0b233f"/>
+              <!-- cabeça -->
+              <circle cx="100" cy="88" r="50" fill="#ffd9a6" />
+              <!-- cabelo -->
+              <path d="M52,88 C52,55 78,38 100,38 C122,38 148,55 148,88
+                       C132,78 120,74 100,74 C80,74 68,78 52,88 Z"
+                    fill="#0e1322"/>
+              <!-- orelhas -->
+              <circle cx="52" cy="96" r="8" fill="#ffd9a6"/>
+              <circle cx="148" cy="96" r="8" fill="#ffd9a6"/>
+              <!-- olhos -->
+              <ellipse cx="82" cy="102" rx="6" ry="4" fill="#15233a"/>
+              <ellipse cx="118" cy="102" rx="6" ry="4" fill="#15233a"/>
+              <!-- nariz -->
+              <path d="M100 100 L98 116 Q100 118 102 116 Z" fill="#efc08a"/>
+              <!-- bigode clássico -->
+              <path d="M78 118 C88 126, 112 126, 122 118
+                       C111 122, 89 122, 78 118 Z" fill="#1b2235"/>
+              <!-- boca (animada) -->
+              <rect id="mouth" x="92" y="130" width="16" height="6" rx="3" fill="#c96f6f"/>
+              <!-- terno -->
+              <path d="M50,210 L150,210 L140,140 L60,140 Z" fill="#0e1322"/>
+              <rect x="92" y="138" width="16" height="36" fill="#e6eefc"/>
+              <path d="M100,174 L110,210 L90,210 Z" fill="#27406b"/>
+              <!-- faíscas -->
+              <g id="sparks" stroke="#ffd166" stroke-width="2" fill="none">
+                <polyline points="30,40 40,45 32,55 44,62 36,72"/>
+                <polyline points="170,44 160,50 168,60 156,66 164,76"/>
+                <polyline points="24,110 34,108 28,120 40,122 34,134"/>
+                <polyline points="176,112 166,110 172,122 160,124 166,136"/>
+              </g>
+            </svg>
+
+            <!-- Balão de fala -->
+            <div class="bubble">
+              <p id="nText">Clique em “Narrar automático” e eu explico o que muda em tempo real.</p>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top:2px">
+            <button id="toggleAuto" class="warn">▶️ Narrar automático</button>
+            <button id="sayNow">🔊 Falar agora</button>
+            <button id="pause" class="secondary">⏸ Pausar</button>
+          </div>
+
+          <div class="kv">
+            <span>Tipo do sistema:</span> <div id="tipo">—</div>
+            <span>Interação:</span> <div id="interacao">—</div>
+            <span>Separação d:</span> <div id="sep">—</div>
+            <span>Orientação:</span> <div id="orient">—</div>
+            <span>Tendência em X:</span> <div id="trendX">—</div>
+            <span>Tendência em Y:</span> <div id="trendY">—</div>
+            <span>Campo no meio:</span> <div id="midE">—</div>
+          </div>
+          <ul id="story" class="bullets"></ul>
+          <p class="note">Dica: arraste as <b>esferas</b> no quadro ou use os controles abaixo. O Tesla narra o que acontece.</p>
+        </div>
+      </div>
+
+      <!-- Controles abaixo -->
+      <div class="ctrl-grid">
+        <div class="ctrl">
+          <h4 style="margin:0 0 6px">Q₁ (esquerda)</h4>
+          <label>Módulo e sinal</label>
+          <input id="q1" type="range" min="-2" max="2" step="0.1" value="1">
+          <label>Posição X₁</label>
+          <input id="x1" type="range" min="-1.9" max="0" step="0.02" value="-1">
+          <label>Posição Y₁</label>
+          <input id="y1" type="range" min="-1.6" max="1.6" step="0.02" value="0">
+        </div>
+        <div class="ctrl">
+          <h4 style="margin:0 0 6px">Q₂ (direita)</h4>
+          <label>Módulo e sinal</label>
+          <input id="q2" type="range" min="-2" max="2" step="0.1" value="-1">
+          <label>Posição X₂</label>
+          <input id="x2" type="range" min="0" max="1.9" step="0.02" value="1">
+          <label>Posição Y₂</label>
+          <input id="y2" type="range" min="-1.6" max="1.6" step="0.02" value="0">
+        </div>
+      </div>
+
+      <div class="controls" style="margin-top:10px">
+        <button id="bField">Setas (vetor)</button>
+        <button id="bLines">Linhas de campo</button>
+        <button id="bBoth" class="secondary">Ambos</button>
+        <button id="bReset" class="secondary">Reiniciar</button>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =================== Canvas de duas cargas (arrastáveis) =================== */
+const cv = document.getElementById('sim');
+const ctx = cv.getContext('2d');
+const state = { mode:'both', dragging:null, easing:0.18 };
+
+const q1=document.getElementById('q1'), x1=document.getElementById('x1'), y1=document.getElementById('y1');
+const q2=document.getElementById('q2'), x2=document.getElementById('x2'), y2=document.getElementById('y2');
+
+function toPx(x,y){ const w=cv.width,h=cv.height; return [ (x+2)/4*w, h - (y+2)/4*h ]; }
+function toWorld(px,py){ const w=cv.width,h=cv.height; return [ 4*px/w-2, 2 - 4*py/h ]; }
+function clear(){ ctx.clearRect(0,0,cv.width,cv.height); }
+function grid(a=0.18, step=0.5){
+  ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle='#2a3d77'; ctx.lineWidth=1;
+  for(let x=-2;x<=2;x+=step){ const a=toPx(x,-2), b=toPx(x,2); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+  for(let y=-2;y<=2;y+=step){ const a=toPx(-2,y), b=toPx(2,y); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+  ctx.restore();
+}
+function drawCharge(x,y,q, glow=false){
+  const [px,py]=toPx(x,y); ctx.save(); ctx.lineWidth=2;
+  if(q>0){ ctx.fillStyle='#ff8585'; ctx.strokeStyle='#a52a2a'; }
+  else   { ctx.fillStyle='#7aa7ff'; ctx.strokeStyle='#204080'; }
+  if(glow){ ctx.shadowColor= q>0?'#fecaca':'#c8d8ff'; ctx.shadowBlur=18; }
+  ctx.beginPath(); ctx.arc(px,py,12,0,Math.PI*2); ctx.fill(); ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.fillStyle='#fff'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillText(q>0?'+':'−',px,py+1); ctx.restore();
+}
+const charges = [
+  { x:+x1.value, y:+y1.value, q:+q1.value, tx:+x1.value, ty:+y1.value },
+  { x:+x2.value, y:+y2.value, q:+q2.value, tx:+x2.value, ty:+y2.value }
+];
+function fieldAt(x,y,c){ const dx=x-c.x,dy=y-c.y, r2=dx*dx+dy*dy+0.05; const invr3=1/Math.pow(r2,1.5); return [c.q*dx*invr3, c.q*dy*invr3]; }
+function field(x,y){ let Ex=0,Ey=0; for(const c of charges){ const [ex,ey]=fieldAt(x,y,c); Ex+=ex; Ey+=ey; } return [Ex,Ey]; }
+function arrow(x,y,vx,vy,scale=0.18,col='#7fd3ff',alpha=0.9){
+  const len=Math.hypot(vx,vy)||1, ux=vx/len, uy=vy/len, L=scale;
+  const [sx,sy]=toPx(x,y), [ex,ey]=toPx(x+ux*L,y+uy*L);
+  ctx.save(); ctx.globalAlpha=alpha; ctx.strokeStyle=col; ctx.fillStyle=col; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke();
+  const a=Math.atan2(ey-sy,ex-sx), ah=7; ctx.beginPath(); ctx.moveTo(ex,ey);
+  ctx.lineTo(ex-ah*Math.cos(a-0.45),ey-ah*Math.sin(a-0.45));
+  ctx.lineTo(ex-ah*Math.cos(a+0.45),ey-ah*Math.sin(a+0.45)); ctx.closePath(); ctx.fill(); ctx.restore();
+}
+const seeds = []; for(let k=0;k<18;k++){ const ang=k/18*Math.PI*2; seeds.push({x:-0.2+0.22*Math.cos(ang),y:0.22*Math.sin(ang)}); }
+function stepEuler(p,h=0.03){ const [Ex,Ey]=field(p.x,p.y); p.x+=Ex*h; p.y+=Ey*h; return p; }
+function inBounds(p){ return Math.abs(p.x)<=2.05 && Math.abs(p.y)<=2.05; }
+function drawStreamlines(){
+  ctx.save(); ctx.strokeStyle='#ffd166'; ctx.globalAlpha=0.9; ctx.lineWidth=1.5;
+  for(const s of seeds){
+    let p={x:s.x,y:s.y}; ctx.beginPath(); let [px,py]=toPx(p.x,p.y); ctx.moveTo(px,py);
+    for(let k=0;k<240;k++){ p=stepEuler(p,0.06); if(!inBounds(p)) break; [px,py]=toPx(p.x,p.y); ctx.lineTo(px,py); }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* análise + narrativa */
+const tipoEl=document.getElementById('tipo'), intEl=document.getElementById('interacao'),
+      sepEl=document.getElementById('sep'),  oriEl=document.getElementById('orient'),
+      txEl=document.getElementById('trendX'), tyEl=document.getElementById('trendY'),
+      midEl=document.getElementById('midE'),  story=document.getElementById('story'),
+      teslaBox=document.getElementById('teslaBox'), nText=document.getElementById('nText');
+const prev = { dx:null, dy:null };
+function fmt(n){ return Number(n).toFixed(2); }
+function classify(){
+  const qA=charges[0].q, qB=charges[1].q;
+  const sA=Math.sign(qA), sB=Math.sign(qB);
+  const magRatio = Math.min(Math.abs(qA),Math.abs(qB)) / Math.max(Math.abs(qA),Math.abs(qB) || 1);
+  let tipo='—';
+  if (sA*sB<0 && magRatio>0.6) tipo='Dipolo (opostos, módulos parecidos)';
+  else if (sA*sB>0 && magRatio>0.6) tipo='Par igual (mesmo sinal, módulos parecidos)';
+  else tipo='Monopolo dominante (uma carga predomina)';
+  const inter = (sA*sB<0) ? 'Atração (linhas saem do + e chegam no −)' : 'Repulsão (linhas saem de ambas)';
+  return {tipo, inter};
+}
+function orientation(dx,dy){
+  const ang = Math.atan2(dy,dx); const deg = ((ang*180/Math.PI)+360)%360;
+  const ref = Math.abs(dy)>Math.abs(dx) ? 'preferência no eixo Y' :
+              Math.abs(dx)>Math.abs(dy) ? 'preferência no eixo X' : 'diagonal';
+  return `${ref} (θ ≈ ${fmt(deg)}°)`;
+}
+function trends(dx,dy){
+  let tX='—', tY='—';
+  if (prev.dx!==null) tX = (Math.abs(dx)<Math.abs(prev.dx))?'aproximação em X (↘)':'afastamento em X (↗)';
+  if (prev.dy!==null) tY = (Math.abs(dy)<Math.abs(prev.dy))?'aproximação em Y (↘)':'afastamento em Y (↗)';
+  prev.dx=dx; prev.dy=dy; return {tX,tY};
+}
+function midField(){
+  const mx=(charges[0].x+charges[1].x)/2, my=(charges[0].y+charges[1].y)/2;
+  const [Ex,Ey]=field(mx,my); const E=Math.hypot(Ex,Ey);
+  let txt=`|E| ≈ ${fmt(E)} (no ponto médio)`;
+  const similar = Math.abs(Math.abs(charges[0].q)-Math.abs(charges[1].q)) < 0.2;
+  if (similar && Math.sign(charges[0].q)===Math.sign(charges[1].q) && E<0.05) txt+=' — quase nulo por simetria';
+  if (similar && Math.sign(charges[0].q)!==Math.sign(charges[1].q)) txt+=' — direção do + para o −';
+  return txt;
+}
+function narrative(dx,dy){
+  const arr=[];
+  if (Math.sign(charges[0].q)!==Math.sign(charges[1].q)) arr.push('Sinais opostos: linhas partem do + e chegam no − (atração).');
+  else { arr.push('Sinais iguais: linhas saem de ambas (repulsão).'); arr.push('Entre as cargas pode surgir região de campo fraco por cancelamento.'); }
+  if (Math.abs(dy)>Math.abs(dx)) arr.push('Configuração mais “vertical”: variações em Y dominam.');
+  else if (Math.abs(dx)>Math.abs(dy)) arr.push('Configuração mais “horizontal”: variações em X dominam.');
+  else arr.push('Ligação aproximadamente diagonal entre as cargas.');
+  return arr;
+}
+
+/* Narrador (texto + voz) */
+const toggleAuto = document.getElementById('toggleAuto');
+const sayNow = document.getElementById('sayNow');
+const pauseBtn = document.getElementById('pause');
+
+let auto = false, lastNarration = '', lastSpokeAt = 0;
+function buildNarration(){
+  const dx=charges[1].x-charges[0].x, dy=charges[1].y-charges[0].y, d=Math.hypot(dx,dy);
+  const cls=classify(), tr=trends(dx,dy);
+  const mid=midField();
+  const dir = orientation(dx,dy).replace(/\(.*\)/,'').trim();
+  let mode = state.mode==='both' ? 'setas e linhas' : (state.mode==='field' ? 'setas' : 'linhas');
+  return `Sistema: ${cls.tipo}. ${cls.inter}. Distância d aproximadamente ${fmt(d)}. `+
+         `Orientação com ${dir}. Tendência: ${tr.tX} e ${tr.tY}. `+
+         `No ponto médio, ${mid}. Visualização atual: ${mode}.`;
+}
+function speak(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  u.lang='pt-BR';
+  const vs=window.speechSynthesis.getVoices().filter(v=>/pt|braz/i.test(v.lang+v.name));
+  if(vs[0]) u.voice=vs[0];
+  u.onstart=()=> teslaBox.classList.add('talk');
+  u.onend  =()=> teslaBox.classList.remove('talk');
+  window.speechSynthesis.speak(u);
+}
+function updateNarrator(force=false){
+  const now = performance.now();
+  const msg = buildNarration();
+  nText.textContent = msg;
+  const enoughTime = (now - lastSpokeAt) > 3000;
+  const changed = msg !== lastNarration;
+  if((auto && changed && enoughTime) || force){
+    speak(msg);
+    lastSpokeAt = performance.now();
+    lastNarration = msg;
+  }
+}
+toggleAuto.onclick = ()=>{
+  auto = !auto;
+  toggleAuto.textContent = auto ? '⏹ Parar narração automática' : '▶️ Narrar automático';
+  toggleAuto.classList.toggle('warn', !auto);
+  if(auto){ updateNarrator(true); }
+  else { if('speechSynthesis' in window) speechSynthesis.cancel(); teslaBox.classList.remove('talk'); }
+};
+sayNow.onclick = ()=> updateNarrator(true);
+pauseBtn.onclick = ()=> { if('speechSynthesis' in window) speechSynthesis.cancel(); teslaBox.classList.remove('talk'); };
+
+/* sliders → atualizam alvo e texto */
+[q1,x1,y1,q2,x2,y2].forEach(el=>el.addEventListener('input', ()=>{
+  charges[0].q=+q1.value; charges[1].q=+q2.value;
+  charges[0].tx=+x1.value; charges[0].ty=+y1.value;
+  charges[1].tx=+x2.value; charges[1].ty=+y2.value;
+  updateNarrator();
+}));
+
+/* arrastar as cargas no canvas */
+function hitTest(px,py){
+  for(let i=0;i<2;i++){
+    const [cx,cy]=toPx(charges[i].x,charges[i].y);
+    if(Math.hypot(px-cx,py-cy)<=16) return i;
+  } return -1;
+}
+function clamp(v,min,max){ return Math.max(min,Math.min(max,v)); }
+function onPointerDown(e){
+  const rect=cv.getBoundingClientRect();
+  const px=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const py=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  const id=hitTest(px,py);
+  if(id>=0){ state.dragging=id; e.preventDefault(); }
+}
+function onPointerMove(e){
+  if(state.dragging===null) return;
+  const rect=cv.getBoundingClientRect();
+  const px=(e.touches?e.touches[0].clientX:e.clientX)-rect.left;
+  const py=(e.touches?e.touches[0].clientY:e.clientY)-rect.top;
+  let [wx,wy]=toWorld(px,py);
+  wx=clamp(wx,-1.95,1.95); wy=clamp(wy,-1.7,1.7);
+  const c=charges[state.dragging]; c.tx=wx; c.ty=wy;
+  if(state.dragging===0){ x1.value=wx; y1.value=wy; } else { x2.value=wx; y2.value=wy; }
+  updateNarrator();
+}
+function onPointerUp(){ state.dragging=null; }
+
+cv.addEventListener('mousedown',onPointerDown);
+cv.addEventListener('mousemove',onPointerMove);
+window.addEventListener('mouseup',onPointerUp);
+cv.addEventListener('touchstart',onPointerDown,{passive:false});
+cv.addEventListener('touchmove',onPointerMove,{passive:false});
+window.addEventListener('touchend',onPointerUp);
+
+/* botões de visualização */
+document.getElementById('bField').onclick = ()=>{ state.mode='field'; updateNarrator(); };
+document.getElementById('bLines').onclick = ()=>{ state.mode='lines'; updateNarrator(); };
+document.getElementById('bBoth').onclick  = ()=>{ state.mode='both';  updateNarrator(); };
+document.getElementById('bReset').onclick = ()=>{
+  q1.value=1; q2.value=-1;
+  x1.value=-1; y1.value=0; x2.value=1; y2.value=0;
+  charges[0].q=+q1.value; charges[1].q=+q2.value;
+  charges[0].tx=+x1.value; charges[0].ty=+y1.value;
+  charges[1].tx=+x2.value; charges[1].ty=+y2.value;
+  prev.dx=null; prev.dy=null;
+  updateNarrator(true);
+};
+
+/* render animado (easing) + painel */
+function render(){
+  clear(); grid();
+  charges.forEach(c=>{ c.x += (c.tx - c.x)*state.easing; c.y += (c.ty - c.y)*state.easing; });
+
+  if(state.mode==='field' || state.mode==='both'){
+    for(let yy=-1.6;yy<=1.6;yy+=0.4){ for(let xx=-1.8;xx<=1.8;xx+=0.4){
+      const [Ex,Ey]=field(xx,yy); arrow(xx,yy,Ex,Ey,0.14);
+    } }
+  }
+  if(state.mode==='lines' || state.mode==='both'){ drawStreamlines(); }
+
+  drawCharge(charges[0].x,charges[0].y,charges[0].q, state.dragging===0);
+  drawCharge(charges[1].x,charges[1].y,charges[1].q, state.dragging===1);
+
+  const dx=charges[1].x-charges[0].x, dy=charges[1].y-charges[0].y, d=Math.hypot(dx,dy);
+  const cls=classify(), tr=trends(dx,dy);
+  tipoEl.textContent=cls.tipo; intEl.textContent=cls.inter;
+  sepEl.textContent=`d ≈ ${fmt(d)} (dx=${fmt(dx)}, dy=${fmt(dy)})`;
+  oriEl.textContent=orientation(dx,dy);
+  txEl.textContent=tr.tX; tyEl.textContent=tr.tY;
+  midEl.textContent=midField();
+  story.innerHTML=''; narrative(dx,dy).forEach(t=>{ const li=document.createElement('li'); li.textContent=t; story.appendChild(li); });
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</script>
+</body>
+</html>

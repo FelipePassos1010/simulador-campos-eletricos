@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Fluxograma — Campo Elétrico (fix Mermaid)</title>
+
+<style>
+  :root{
+    --bg:#0b1020; --ink:#e7eef7; --muted:#a9b7d0; --card:#0f1730; --b:#1c2948;
+    --hi:#ffd166; --setup:#6ee7b7; --func:#93c5fd; --comp:#fca5a5; --render:#fbbf24; --final:#c4b5fd; --accent:#22d3ee;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;color:var(--ink);
+       background:radial-gradient(900px 600px at 10% -10%,#0d1630 0%,transparent 60%),linear-gradient(180deg,#0a1124,#0b1020)}
+  header{padding:14px 22px;border-bottom:1px solid var(--b);display:flex;gap:12px;align-items:center}
+  .brand{font-weight:800}
+  main{max-width:1280px;margin:0 auto;padding:20px;display:grid;grid-template-columns:1fr 380px;gap:18px}
+  @media (max-width:1100px){main{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,.01));border:1px solid var(--b);border-radius:18px;padding:16px;box-shadow:0 24px 48px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04)}
+  .title{font-weight:800;margin:0 0 8px}
+  .panel{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+  .panel label{color:var(--muted);font-size:13px}
+  select{background:#111a36;border:1px solid var(--b);color:var(--ink);border-radius:8px;padding:8px}
+  input[type="range"]{width:180px}
+  .progress{flex:1;height:8px;border-radius:6px;background:#111a36;overflow:hidden;border:1px solid var(--b)}
+  .progress>span{display:block;height:100%;background:linear-gradient(90deg,#22d3ee,#60a5fa);width:0%}
+  .grid{display:grid;gap:12px;grid-template-columns:1fr 1fr;grid-template-areas:"pan pan" "ini meio" "fim fim"}
+  .box{background:#0c1430a6;border:1px solid var(--b);border-radius:14px;padding:10px;min-height:260px}
+  .box h3{margin:4px 0 10px 0;font-size:16px}
+  .diagram{border-radius:8px;overflow:auto;min-height:210px;transform-origin:top left}
+  .box.panorama{grid-area:pan} .box.inicio{grid-area:ini} .box.meio{grid-area:meio} .box.fim{grid-area:fim}
+  .highlight rect,.highlight path,.highlight polygon{filter:drop-shadow(0 0 .55rem rgba(255,209,102,.95));stroke:var(--hi)!important;stroke-width:3px!important}
+  .row{display:flex;gap:12px;align-items:flex-start}
+  .avatar{width:64px;height:64px;border-radius:50%;border:2px solid #0ea5b7aa;background:
+      radial-gradient(12px 10px at 32px 26px,#fff8,transparent 60%),
+      radial-gradient(12px 10px at 18px 26px,#fff8,transparent 60%),
+      radial-gradient(60px 60px at 50% 70%,#ffe9b3,#ffcc7a 60%),
+      radial-gradient(80px 80px at 50% -10%,#2dd4bf,#0891b2);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+  .bubble{flex:1;background:#0e1635;border:1px solid var(--b);border-radius:12px;padding:12px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  button{background:var(--accent);color:#05212a;border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(34,211,238,.25)}
+  button.secondary{background:#1f2937;color:#e5e7eb} button.warn{background:#ffd166;color:#32250a} button:disabled{opacity:.55;cursor:not-allowed}
+  .legend{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+  .key{display:flex;align-items:center;gap:8px;font-size:13px;color:#a9badf}
+  .dot{width:12px;height:12px;border-radius:50%}
+  .k-setup{background:var(--setup)} .k-func{background:var(--func)} .k-comp{background:var(--comp)} .k-render{background:var(--render)} .k-final{background:var(--final)}
+  .bullets{margin:10px 0 0 18px; padding:0}
+  .bullets li{margin:6px 0; color:#cdd7ee}
+  .bullets li code{background:#0b1430; border:1px solid #1c2948; padding:.1rem .35rem; border-radius:6px; color:#9bd2ff; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .anim-wrap{margin-top:12px}
+  .anim-head{display:flex;align-items:center;justify-content:space-between}
+  .anim-head small{color:#a9b7d0}
+  canvas#anim{width:100%; height:220px; border-radius:10px; border:1px solid var(--b); background:#081029}
+  .equacoes{margin-top:16px;background:#0c1430a6;border:1px solid var(--b);border-radius:12px;padding:12px}
+  .equacoes h3{margin:0 0 8px 0}
+  .eq-table{width:100%;border-collapse:collapse;font-size:14px}
+  .eq-table th,.eq-table td{border:1px solid #1c2948;padding:8px 10px;vertical-align:top}
+  .eq-table th{background:#0f1a3c;color:#cfe2ff}
+  .tag{display:inline-block;background:#1b2a55;border:1px solid #27407f;color:#cfe2ff;border-radius:8px;padding:2px 8px;font-size:12px;margin-right:6px}
+  .hint{color:#9fb0d8;font-size:13px;margin-top:8px}
+  .error{display:none;margin-top:8px;color:#fecaca;background:#7f1d1d;padding:8px;border:1px solid #b91c1c;border-radius:10px}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({
+    startOnLoad:false,
+    theme:"dark",
+    securityLevel:"loose",
+    flowchart:{ htmlLabels:false, curve:"basis" }
+  });
+</script>
+</head>
+<body>
+<header>
+  <div class="brand">Fluxograma — Simulador de Campo Elétrico</div>
+  <div style="margin-left:auto;color:#a9b7d0;font-size:13px">Quadros complementares + animações + equações</div>
+</header>
+
+<main>
+  <section class="card">
+    <h2 class="title">Fluxograma</h2>
+    <div class="panel">
+      <label for="layout">Layout:</label>
+      <select id="layout"><option value="TD">Vertical (TD)</option><option value="LR">Horizontal (LR)</option></select>
+      <label for="zoom">Zoom:</label><input id="zoom" type="range" min="70" max="160" value="100"/>
+      <div class="progress"><span id="bar"></span></div>
+    </div>
+
+    <div class="grid">
+      <div class="box panorama"><h3>Panorama (Tudo junto)</h3><div id="diag-all" class="diagram"></div></div>
+      <div class="box inicio"><h3>Início</h3><div id="diag-start" class="diagram"></div></div>
+      <div class="box meio"><h3>Meio</h3><div id="diag-middle" class="diagram"></div></div>
+      <div class="box fim"><h3>Fim</h3><div id="diag-end" class="diagram"></div></div>
+    </div>
+
+    <div class="equacoes">
+      <h3>Equações utilizadas</h3>
+      <table class="eq-table">
+        <thead><tr><th>Etapa</th><th>Equação (ASCII)</th><th>Finalidade</th></tr></thead>
+        <tbody id="eq-body"></tbody>
+      </table>
+      <div class="hint">As equações ficam aqui (ASCII). No fluxograma usamos apenas texto.</div>
+    </div>
+
+    <div id="diagError" class="error"></div>
+
+    <div class="legend">
+      <div class="key"><span class="dot k-setup"></span>Preparação</div>
+      <div class="key"><span class="dot k-func"></span>Funções</div>
+      <div class="key"><span class="dot k-comp"></span>Cálculo</div>
+      <div class="key"><span class="dot k-render"></span>Renderização</div>
+      <div class="key"><span class="dot k-final"></span>Finalização</div>
+    </div>
+  </section>
+
+  <aside class="card">
+    <h2 class="title">Profe-Bot 😊</h2>
+    <div class="row">
+      <div class="avatar" aria-hidden="true"></div>
+      <div class="bubble">
+        <div id="fala">Clique em “Próximo” para revelar o passo atual.</div>
+        <ul id="detalhe" class="bullets"></ul>
+        <div class="controls">
+          <button id="prev" class="secondary" disabled>⟵ Anterior</button>
+          <button id="next">Próximo ⟶</button>
+          <button id="auto" class="warn">▶️ Auto</button>
+          <button id="stop" class="secondary">⏹ Parar</button>
+          <button id="reset" class="secondary">🔄 Reiniciar</button>
+          <button id="speak">🔊 Ouvir</button>
+        </div>
+        <div id="ttsError" class="error"></div>
+
+        <div class="anim-wrap">
+          <div class="anim-head">
+            <strong>Exemplo animado</strong>
+            <small id="animLabel">—</small>
+          </div>
+          <canvas id="anim" width="360" height="220"></canvas>
+        </div>
+        <div class="hint">Grade, uma carga, duas cargas, superposição, linhas e setas.</div>
+      </div>
+    </div>
+  </aside>
+</main>
+
+<script>
+/* ==================== GRAFO — frases simples ==================== */
+const CS='cs', CF='cf', CC='cc', CR='cr', CL='cl';
+const nodeClass = { A:CS,B:CS,C:CS, D:CF,E:CF, F:CC,G:CC,H:CC,I:CC, J:CR,K:CR,L:CR,M:CR,N:CR, O:CL,P:CL };
+
+const LINES = [
+  'A([Inicio])',
+  'A --> B[Importa bibliotecas: NumPy e Matplotlib]',
+  'B --> C[Define constante k Coulomb]',
+  'C --> D[Funcao electric_field calcula componentes de uma carga]',
+  'D --> E[Funcao plot_field configura a cena]',
+  'E --> F[Gera grade XY meshgrid]',
+  'F --> G[Campo da primeira carga]',
+  'F --> H[Campo da segunda carga]',
+  'G --> I[Soma vetorial dos componentes]',
+  'H --> I',
+  'I --> J[Calcula intensidade do campo escala log]',
+  'J --> K[Desenha linhas de campo]',
+  'K --> L[Setas quiver opcionais]',
+  'I --> M[Marca cargas e rotulos]',
+  'J --> N[Ajusta eixos limites e titulo]',
+  'L --> O[Main escolhe exemplo e chama plot_field]',
+  'O --> P[Se arquivo principal executa e mostra]'
+];
+
+/* — rótulos extraídos — */
+const nodeLabels = {};
+(function(){
+  const reNode = /^\s*([A-Z])\s*[\(\[]\s*([^\]\)]+)\s*[\]\)]/;
+  const reEdgeTo = /-->\s*([A-Z])\s*\[([^\]]+)\]/;
+  for(const line of LINES){
+    const n=line.match(reNode); if(n) nodeLabels[n[1]]=n[2].trim();
+    const e=line.match(reEdgeTo); if(e) nodeLabels[e[1]]=e[2].trim();
+  }
+  'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(id=>{ if(!nodeLabels[id]) nodeLabels[id]=id; });
+})();
+
+/* passos / falas */
+const steps = [
+  {id:'A', upto:0,  say:'Início do programa.', bullets:['Programa começa a rodar.','Organizamos funções e opções.'], anim:'start'},
+  {id:'B', upto:1,  say:'Importamos as bibliotecas.', bullets:['NumPy para contas.','Matplotlib para desenhos.'], anim:'imports'},
+  {id:'C', upto:2,  say:'Definimos a constante elétrica k.', bullets:['k regula a força do campo.'], anim:'const'},
+  {id:'D', upto:3,  say:'Função que calcula o campo de uma carga.', bullets:['Entrada: ponto e dados da carga.','Saída: Ex e Ey.'], anim:'onecharge'},
+  {id:'E', upto:4,  say:'Função que organiza o desenho.', bullets:['Limites, opções visuais e posição.'], anim:'setup'},
+  {id:'F', upto:5,  say:'Criamos a grade de pontos.', bullets:['Tabuleiro onde medimos o campo.'], anim:'grid'},
+  {id:'G', upto:6,  say:'Campo da primeira carga.', bullets:['Criamos Ex1 e Ey1.'], anim:'field1'},
+  {id:'H', upto:7,  say:'Campo da segunda carga.', bullets:['Criamos Ex2 e Ey2.'], anim:'field2'},
+  {id:'I', upto:10, say:'Somamos os campos.', bullets:['Ex=Ex1+Ex2; Ey=Ey1+Ey2.'], anim:'sum'},
+  {id:'J', upto:10, say:'Calculamos a intensidade e o fundo.', bullets:['Módulo do vetor e escala log.'], anim:'magnitude'},
+  {id:'K', upto:11, say:'Desenhamos as linhas de campo.', bullets:['Direção que a carga de teste seguiria.'], anim:'stream'},
+  {id:'L', upto:12, say:'Setas quiver opcionais.', bullets:['Flechinhas usando Ex e Ey.'], anim:'quiver'},
+  {id:'M', upto:13, say:'Marcamos as cargas.', bullets:['Posições e sinais.'], anim:'mark'},
+  {id:'N', upto:14, say:'Ajustes finais.', bullets:['Título e limites.'], anim:'tidy'},
+  {id:'O', upto:15, say:'Na main escolhemos exemplo e chamamos a função.', bullets:['Testar casos diferentes.'], anim:'main'},
+  {id:'P', upto:16, say:'Executamos e mostramos na tela.', bullets:['Resultado final.'], anim:'show'}
+];
+
+/* equações (só tabela) */
+const equations = [
+  { etapa:'C (k)', eq:'k = 1 / (4 * pi * epsilon0)', finalidade:'Constante de proporcionalidade do campo' },
+  { etapa:'D (uma carga)', eq:'E = k * q * r_hat / r^2', finalidade:'Campo de uma carga pontual' },
+  { etapa:'D (componentes)', eq:'Ex = E * (dx / r);  Ey = E * (dy / r)', finalidade:'Decompor em x e y' },
+  { etapa:'I (soma)', eq:'Ex_total = Ex1 + Ex2;  Ey_total = Ey1 + Ey2', finalidade:'Superposição' },
+  { etapa:'J (intensidade)', eq:'|E| = sqrt( Ex_total^2 + Ey_total^2 )', finalidade:'Força do campo' },
+  { etapa:'J (escala)', eq:'fundo = log( 1 + |E| )', finalidade:'Contraste visual' }
+];
+
+/* ======== construção do Mermaid com RÓTULOS ENTRE ASPAS ======== */
+function directive(dir){ return `%%{init: {"theme":"dark","flowchart":{"htmlLabels":false,"curve":"basis"}}}%%\nflowchart ${dir}\n`; }
+function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim()||'#fff'; }
+function classDefs(){
+  return [
+    `classDef cs fill:${css('--setup')},stroke:#62d2b2,stroke-width:2px,color:#081a12`,
+    `classDef cf fill:${css('--func')},stroke:#6aa7fe,stroke-width:2px,color:#0a1324`,
+    `classDef cc fill:${css('--comp')},stroke:#f38787,stroke-width:2px,color:#290808`,
+    `classDef cr fill:${css('--render')},stroke:#f59e0b,stroke-width:2px,color:#1a1202`,
+    `classDef cl fill:${css('--final')},stroke:#a78bfa,stroke-width:2px,color:#140c2e`
+  ].join('\n');
+}
+function classAssign(ids){ return ids.map(id=>`class ${id} ${nodeClass[id]||CS}`).join('\n'); }
+
+function parseEdge(l){ const m=l.match(/^\s*([A-Z])\s*-->\s*([A-Z])(?:\s*\[([^\]]+)\])?\s*$/); return m?{from:m[1],to:m[2],toLabel:m[3]||null}:null; }
+function parseNode(l){ const m=l.match(/^\s*([A-Z])\s*[\(\[]\s*([^\]\)]+)\s*[\]\)]\s*$/); return m?{id:m[1],label:m[2]}:null; }
+
+function esc(s){ return String(s).replace(/"/g,'\\"'); } // escapa aspas
+
+function buildSubsetText(dir, upto, keep){
+  const nodes=new Map(), edges=[];
+  for(let i=0;i<=upto;i++){
+    if(!keep(i)) continue;
+    const n=parseNode(LINES[i]); if(n){ nodes.set(n.id,n.label); continue; }
+    const e=parseEdge(LINES[i]); if(e){ if(e.toLabel) nodes.set(e.to,e.toLabel); edges.push({from:e.from,to:e.to}); }
+  }
+  edges.forEach(e=>{ if(!nodes.has(e.from)) nodes.set(e.from,nodeLabels[e.from]||e.from);
+                     if(!nodes.has(e.to))   nodes.set(e.to,  nodeLabels[e.to]  ||e.to); });
+  const out=[directive(dir), classDefs()]; // classDef ANTES de nodes/edges
+  [...nodes.keys()].sort().forEach(id=>{
+    const lbl=(nodes.get(id)||id);
+    out.push(`${id}["${esc(lbl)}"]`);
+  });
+  edges.forEach(e=> out.push(`${e.from} --> ${e.to}`));
+  out.push(classAssign([...nodes.keys()]));
+  return out.join('\n');
+}
+
+const isStart=i=>i<=5, isMiddle=i=>i>5&&i<=14, isEnd=i=>i>14;
+const graphText =(d,u)=>buildSubsetText(d,u,_=>true);
+const startText =(d,u)=>buildSubsetText(d,u,i=>isStart(i));
+const middleText=(d,u)=>buildSubsetText(d,u,i=>isMiddle(i));
+const endText   =(d,u)=>buildSubsetText(d,u,i=>isEnd(i));
+
+function renderInto(container, text, highlightId){
+  container.innerHTML=''; const el=document.createElement('div'); el.className='mermaid'; el.textContent=text; container.appendChild(el);
+  try{
+    mermaid.init(undefined, el);
+    const svg=container.querySelector('svg');
+    if(svg&&highlightId){ const g=svg.querySelector(`g[id$="-${highlightId}"]`)||svg.querySelector(`g[id*="${highlightId}"]`); if(g) g.classList.add('highlight'); }
+  }catch(e){
+    console.error(e);
+    const err=document.getElementById('diagError'); err.textContent='Falha ao renderizar (Mermaid). Pressione Ctrl+F5 ou use mermaid.min.js local.'; err.style.display='block';
+  }
+}
+
+/* ==================== UI / CONTROLES ==================== */
+const diagAll=document.getElementById('diag-all'),
+      diagStart=document.getElementById('diag-start'),
+      diagMid=document.getElementById('diag-middle'),
+      diagEnd=document.getElementById('diag-end');
+const fala=document.getElementById('fala'), detalhe=document.getElementById('detalhe');
+const prev=document.getElementById('prev'), next=document.getElementById('next'),
+      auto=document.getElementById('auto'), stopBtn=document.getElementById('stop'),
+      reset=document.getElementById('reset'), speakBtn=document.getElementById('speak');
+const layoutSel=document.getElementById('layout'), zoom=document.getElementById('zoom'), bar=document.getElementById('bar');
+const eqBody=document.getElementById('eq-body');
+
+function fillEquations(){
+  eqBody.innerHTML='';
+  equations.forEach(e=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="tag">${e.etapa}</span></td><td><code>${e.eq}</code></td><td>${e.finalidade}</td>`;
+    eqBody.appendChild(tr);
+  });
+}
+
+let pos=0, autoTimer=null;
+function updateUI(){ const s=steps[pos]; fala.textContent=s.say; detalhe.innerHTML=''; (s.bullets||[]).forEach(t=>{const li=document.createElement('li'); li.innerHTML=t; detalhe.appendChild(li);}); prev.disabled=(pos===0); next.disabled=(pos===steps.length-1); bar.style.width=Math.round((pos/(steps.length-1))*100)+'%'; animSet(s.anim); }
+function applyZoom(){ const sc=Number(zoom.value)/100; [diagAll,diagStart,diagMid,diagEnd].forEach(el=>{ el.style.transformOrigin='top left'; el.style.transform=`scale(${sc})`; }); }
+function renderAll(){ const dir=layoutSel.value, upto=steps[pos].upto, id=steps[pos].id; renderInto(diagAll,graphText(dir,upto),id); renderInto(diagStart,startText(dir,upto),id); renderInto(diagMid,middleText(dir,upto),id); renderInto(diagEnd,endText(dir,upto),id); }
+function goto(d){ const np=Math.max(0,Math.min(steps.length-1,pos+d)); if(np!==pos){ pos=np; updateUI(); renderAll(); } }
+function startAuto(ms=2400){ stopAuto(); speak(); autoTimer=setInterval(()=>{ if(pos<steps.length-1){ pos++; updateUI(); renderAll(); speak(); } else stopAuto(); }, ms); }
+function stopAuto(){ if(autoTimer){ clearInterval(autoTimer); autoTimer=null; } if('speechSynthesis' in window) window.speechSynthesis.cancel(); }
+function speak(){ const e=document.getElementById('ttsError'); if(!('speechSynthesis' in window)){ e.textContent='Navegador sem Web Speech API.'; e.style.display='block'; return; } e.style.display='none'; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(steps[pos].say); u.lang='pt-BR'; const vs=window.speechSynthesis.getVoices().filter(v=>/pt|braz/i.test(v.lang+v.name)); if(vs[0]) u.voice=vs[0]; window.speechSynthesis.speak(u); }
+prev.addEventListener('click', ()=>{ stopAuto(); goto(-1); });
+next.addEventListener('click', ()=>{ stopAuto(); goto(+1); });
+reset.addEventListener('click',()=>{ stopAuto(); pos=0; updateUI(); renderAll(); });
+auto.addEventListener('click', ()=> startAuto(2400));
+stopBtn.addEventListener('click', stopAuto);
+speakBtn.addEventListener('click', speak);
+zoom.addEventListener('input', applyZoom);
+layoutSel.addEventListener('change', renderAll);
+
+/* ==================== ANIMAÇÕES (Canvas) ==================== */
+const anim=document.getElementById('anim'); const ctx=anim.getContext('2d'); const animLabel=document.getElementById('animLabel');
+let raf=null, t0=0, animMode='start';
+function toPx(x,y){ const w=anim.width,h=anim.height; return [ (x+2)/4*w, h - (y+2)/4*h ]; }
+function clear(){ ctx.clearRect(0,0,anim.width,anim.height); }
+function drawGrid(a=0.2, step=0.5){ ctx.save(); ctx.globalAlpha=a; ctx.strokeStyle='#2a3d77'; ctx.lineWidth=1; for(let x=-2;x<=2;x+=step){ const a=toPx(x,-2), b=toPx(x,2); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); } for(let y=-2;y<=2;y+=step){ const a=toPx(-2,y), b=toPx(2,y); ctx.beginPath(); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); } ctx.restore(); }
+function drawCharge(x,y,q){ const [px,py]=toPx(x,y); ctx.save(); ctx.lineWidth=2; if(q>0){ ctx.fillStyle='#ff8585'; ctx.strokeStyle='#a52a2a'; } else { ctx.fillStyle='#7aa7ff'; ctx.strokeStyle='#204080'; } ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.fillStyle='#fff'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(q>0?'+':'−',px,py+1); ctx.restore(); }
+function drawArrow(x,y,vx,vy,scale=0.3,color='#aee',alpha=1){ const len=Math.hypot(vx,vy)||1, ux=vx/len, uy=vy/len, L=scale; const [sx,sy]=toPx(x,y), [ex,ey]=toPx(x+ux*L,y+uy*L); ctx.save(); ctx.globalAlpha=alpha; ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(ex,ey); ctx.stroke(); const ang=Math.atan2(ey-sy,ex-sx), ah=8; ctx.beginPath(); ctx.moveTo(ex,ey); ctx.lineTo(ex-ah*Math.cos(ang-0.4),ey-ah*Math.sin(ang-0.4)); ctx.lineTo(ex-ah*Math.cos(ang+0.4),ey-ah*Math.sin(ang+0.4)); ctx.closePath(); ctx.fill(); ctx.restore(); }
+const charges=[{x:-1,y:0,q:+1},{x:+1,y:0,q:-1}];
+function singleField(x,y,c){ const dx=x-c.x,dy=y-c.y,r2=dx*dx+dy*dy+0.04,invr3=1/Math.pow(r2,1.5); return [c.q*dx*invr3,c.q*dy*invr3]; }
+function field(x,y){ let Ex=0,Ey=0; for(const c of charges){ const [ex,ey]=singleField(x,y,c); Ex+=ex; Ey+=ey; } return [Ex,Ey]; }
+const seeds=[]; for(let a=0;a<16;a++){ const ang=(a/16)*Math.PI*2; seeds.push({x:-1+0.25*Math.cos(ang),y:0.25*Math.sin(ang)}); }
+const parts=seeds.map(s=>({...s}));
+function stepParticles(dt){ for(const p of parts){ const [Ex,Ey]=field(p.x,p.y); p.x+=Ex*dt; p.y+=Ey*dt; if(Math.abs(p.x)>2.2||Math.abs(p.y)>2.2){ const s=seeds[Math.floor(Math.random()*seeds.length)]; p.x=s.x; p.y=s.y; } } }
+function drawParticles(){ ctx.save(); ctx.fillStyle='#66d9ed'; for(const p of parts){ const [px,py]=toPx(p.x,p.y); ctx.beginPath(); ctx.arc(px,py,2,0,Math.PI*2); ctx.fill(); } ctx.restore(); }
+function animSet(mode){ animMode=mode||'start'; animLabel.textContent=mode; t0=performance.now(); if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(tick); }
+function tick(ts){ const t=(ts-t0)/1000; clear();
+  switch(animMode){
+    case 'start': case 'imports': case 'const': case 'setup': drawGrid(0.15,0.5); break;
+    case 'grid': drawGrid(Math.min(1,t*0.8),0.5); break;
+    case 'onecharge': case 'field1':
+      drawGrid(0.15,0.5); drawCharge(charges[0].x,charges[0].y,charges[0].q);
+      for(let y=-1.5;y<=1.5;y+=0.6){ for(let x=-1.5;x<=-0.2;x+=0.6){ const [Ex,Ey]=singleField(x,y,charges[0]); drawArrow(x,y,Ex,Ey,0.35,'#ffd1d1',0.8); } } break;
+    case 'field2':
+      drawGrid(0.15,0.5); drawCharge(charges[1].x,charges[1].y,charges[1].q);
+      for(let y=-1.5;y<=1.5;y+=0.6){ for(let x=0.2;x<=1.5;x+=0.6){ const [Ex,Ey]=singleField(x,y,charges[1]); drawArrow(x,y,Ex,Ey,0.35,'#b9ccff',0.8); } } break;
+    case 'sum':
+      drawGrid(0.15,0.5); drawCharge(charges[0].x,0,+1); drawCharge(charges[1].x,0,-1);
+      const x=0,y=0; const [E1x,E1y]=singleField(x,y,charges[0]); const [E2x,E2y]=singleField(x,y,charges[1]);
+      drawArrow(x,y,E1x,E1y,0.6,'#ffd1d1',1); drawArrow(x,y,E2x,E2y,0.6,'#b9ccff',1); drawArrow(x,y,E1x+E2x,E1y+E2y,0.8,'#66d9ed',1); break;
+    case 'magnitude': case 'stream':
+      drawGrid(0.1,0.5); drawCharge(-1,0,+1); drawCharge(+1,0,-1); stepParticles(0.02); drawParticles(); break;
+    case 'quiver':
+      drawGrid(0.12,0.5); drawCharge(-1,0,+1); drawCharge(+1,0,-1);
+      for(let yy=-1.6;yy<=1.6;yy+=0.4){ for(let xx=-1.8;xx<=1.8;xx+=0.4){ const [Ex,Ey]=field(xx,yy); drawArrow(xx,yy,Ex,Ey,0.18,'#7fd3ff',0.9); } } break;
+    case 'mark':
+      drawGrid(0.12,0.5); const a=0.5+0.5*Math.sin(t*4); drawCharge(-1,0,+1); ctx.globalAlpha=a; drawCharge(+1,0,-1); ctx.globalAlpha=1; break;
+    case 'tidy': case 'main': case 'show':
+      drawGrid(0.08,0.5); drawCharge(-1,0,+1); drawCharge(+1,0,-1);
+      for(let yy=-1.6;yy<=1.6;yy+=0.6){ for(let xx=-1.8;xx<=1.8;xx+=0.6){ const [Ex,Ey]=field(xx,yy); drawArrow(xx,yy,Ex,Ey,0.14,'#7fd3ff',0.5); } }
+      stepParticles(0.02); drawParticles(); break;
+  }
+  raf=requestAnimationFrame(tick);
+}
+
+/* boot */
+function boot(){ 
+  // preenche a tabela e renderiza
+  const eqBody = document.getElementById('eq-body');
+  eqBody.innerHTML='';
+  equations.forEach(e=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td><span class="tag">${e.etapa}</span></td><td><code>${e.eq}</code></td><td>${e.finalidade}</td>`;
+    eqBody.appendChild(tr);
+  });
+  updateUI(); 
+  document.getElementById('zoom').dispatchEvent(new Event('input'));
+  renderAll(); 
+}
+document.addEventListener('DOMContentLoaded', boot);
+</script>
+</body>
+</html>
